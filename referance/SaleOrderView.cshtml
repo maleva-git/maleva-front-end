@@ -1,0 +1,556 @@
+﻿
+@{
+    ViewBag.Title = "SaleOrderView";
+}
+
+
+<!Doctype html>
+<html>
+<head>
+    <link rel="stylesheet" href="~/assets/plugins/Font-Awesome-4.7.0/css/font-awesome.min.css">
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <!-- Bootstrap CSS -->
+    <!--<link rel="stylesheet" href="../assets/css/bootstrap.min.css">-->
+    <!-- Main CSS -->
+    <!--<link rel="stylesheet" href="../assets/css/style.css">
+    <link href="~/Content/BootStrap_4/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/jqwidgets/styles/jqx.base.css" rel="stylesheet" />
+    <link href="~/jqwidgets/styles/jqx.classic.css" rel="stylesheet" />-->
+    <!-- Toatr CSS -->
+    <!--<link rel="stylesheet" href="../assets/plugins/toastr/toatr.css">-->
+    <style>
+        .card {
+            border: none;
+            box-shadow: 3px 3px 9px #888888;
+        }
+
+        .green {
+            color: black\9;
+            background-color: #B0BF44;
+        }
+
+        .yellow {
+            color: black\9;
+            background-color: yellow;
+        }
+
+        .red {
+            color: white;
+            background-color: red;
+        }
+
+        .control-label {
+            font-size: 14px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .card-header {
+            background-color: darkgrey;
+            font-weight: bold;
+            color: white;
+        }
+
+        .form-control {
+            font-size: 14px;
+        }
+
+        .form-group {
+            /*width:60%;*/
+        }
+
+        label {
+            padding-right: 40px;
+            font-weight: bold;
+            color: black;
+        }
+
+        #titleheader {
+            background-color: darkgrey;
+            font-size: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        #block_container {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        #col-container {
+            background-color: white;
+            border-radius: 3px 4px;
+            height: 100%;
+            box-shadow: 3px 3px 9px #888888;
+        }
+
+        .padding-0 {
+            padding-right: 0;
+            padding-left: 0;
+        }
+
+        .container-fluid {
+            overflow: hidden;
+        }
+        .newpreview {
+            height: 500px;
+            width: 800px;
+            overflow: scroll;
+            display: inline-block;
+            margin: 10px;
+            @*grid-template-columns: repeat(3, 1fr); /* 3 columns */
+            gap: 10px;
+            *@
+        }
+
+        .preview1 {
+            display: inline-block;
+            margin: 5px;
+            width: 250px;
+            height: 250px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="global-loader">
+        <div class="whirly-loader"> </div>
+    </div>
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+
+        @Html.Partial("_Header")
+
+        <div class="page-wrapper pagehead">
+            <div class="content" style="padding:10px;">
+
+                <div class="row">
+                    @*<div class="col-sm-3">
+                        </div>*@
+                    <div class="col-sm-12">
+                        <div id="jqxLoader">
+
+                        </div>
+                        <div id="messageNotification">
+                            <div id="NotificationContent">
+
+                            </div>
+                        </div>
+                        <div id="LockEditWindow" style="display: none">
+                            <div><label id="lbllockview">Edit-Pwd</label></div>
+                            <div style="overflow: hidden; background-image: url(/Content/Resources/img/Lock/lock_04N.png); margin-top:6px;margin-left:5px;margin-bottom:6px;display: block;opacity: 0.8; background-size:contain; background-repeat: no-repeat;" id="content">
+                                <div class="row" style="padding-top:68%">
+                                    <div class="col" style="padding-left:18.5%;width:125px;">
+                                        <input style="font-weight:bold;" type="password" id="txtEditpassword" autofocus />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="Statuswindow" style="display: none">
+                            <div>Job Status</div>
+                            <div style="overflow: hidden;" id="windowContentS">
+                                <div id="gridStatus" style="margin-top:1px">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="Employeelogin" style="display: none">
+                            <div>Employee Login</div>
+                            <div style="overflow: hidden;" id="windowContent9">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-inline form-horizontal">
+                                            <div style="text-align : center; width:48%; padding-right:2px;margin-bottom:5px;">
+                                                <label id="lblEmployee">EmployeeName</label>
+                                            </div>
+                                            <div style="width:48%; padding-right:10px;margin-bottom:5px;">
+                                                <div id='cmbEmployeename'></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-inline form-horizontal">
+                                            <div style="text-align : center; width:48%; padding-right:2px;margin-bottom:5px;">
+                                                Password
+                                            </div>
+                                            <div style="width:48%; padding-right:10px;margin-bottom:5px;margin-bottom:5px;">
+                                                <div style="color:black;"><input type="password" id="password" autocomplete="false"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div id="PreviewFile" style="display: none">
+                            <div>FILE ATTACHMENT</div>
+                            <div style="overflow: hidden;" id="windowContent9">
+                                <div class="row" style="margin-top:10px">
+                                    <div class="col-sm-1">
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <div class="card" style="width:95%; padding:10px; margin:5px;" id="cards-col1">
+                                            <div class="form-group">
+                                                <label class="form-label">File Upload*</label>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file" id="filebrowser" aria-describedby="inputGroupFileAddon06" accept="image/x-png,image/jpeg,image/svg,application/pdf,application/vnd.ms-excel,application/msword" onchange="methods.FilePreview()" multiple>
+                                                        <button class='refresh' onclick='methods.FileRefresh()'>Refresh</button>
+                                                        <div class="file-list" id="fileList"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-1">
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top:10px">
+                                    <div class="col-sm-1">
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <div class="card" style="width:95%; padding:10px; margin:5px;" id="cards-col1">
+                                            <div class="file-list2" id="fileList2"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-1">
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-top:10px">
+                                    <div class="col-sm-5">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input class="btn btn-warning" type="button" value="UPLOAD" id='btnFileUpload' style="font-weight:bold; font-family:Verdana;color:#313639;font-size:15px;" />
+                                    </div>
+                                    <div class="col-sm-5">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div id="PreviewImage" style="display: none">
+                            <div>PREVIEW IMAGE</div>
+                            <div style="overflow: hidden;" id="windowContent9">
+                                <div class="row" style="margin-top:10px">
+                                    <div class="col-sm-3">
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-inline form-horizontal">
+                                            <div style="text-align : center; width:50%; padding-right:2px;margin-bottom:5px;">
+                                                <label id="lblImageType">Image Type</label>
+                                            </div>
+                                            <div style="width:50%; padding-right:10px;margin-bottom:5px;">
+                                                <div id='cmbImageType'></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="newpreview" id="preview-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+
+                            <span class="glyphicon glyphicon-user" style="color:dodgerblue;font-weight:bold" id="txtheading">
+                            </span>
+                            @*SALE ORDER*@
+                            <div style="margin-top : 10px"></div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-inline">
+                                        <div class="col-sm-4 padding2px">
+                                            FromDate
+                                        </div>
+                                        <div class="col-sm-8 padding2px">
+                                            <div id='dtpfromdate'></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-inline">
+                                        <div class="col-sm-4 padding2px">
+                                            ToDate
+                                        </div>
+                                        <div class="col-sm-8 padding2px">
+                                            <div id='dtptodate'></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 padding2px">
+                                    <div class="form-inline">
+                                        <div class="col-sm-4">
+                                            Customer
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <div id="cmbcustomerview"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:5px;">
+                                <div class="col-sm-4 padding2px">
+                                    <div class="form-inline">
+                                        <div class="col-sm-4 padding2px">
+                                            Job No
+                                        </div>
+                                        <div class="col-sm-5 padding2px">
+                                            <span><input type="text" id="txtJobNoSearch" autocomplete="false" /></span>
+                                        </div>
+                                        <div class="col-sm-3 text-center padding2px">
+                                            <div id="rbtinv" style="color:black; font-size:15px">
+                                                INV
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 padding2px">
+                                    <div class="form-inline">
+                                        <div class="col-sm-4">
+                                            Employee
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <div id="cmbEmployeenameview"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 padding2px">
+                                    <div class="form-inline">
+                                        <div class="col-sm-4">
+                                            Status
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <div id="cmbstatustypeview"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row" style="margin-top:5px;">
+                                <div class="col-sm-4 padding2px">
+                                    <div class="form-inline">
+                                        <div class="col-sm-4 padding2px">
+                                            OFF VESSEL
+                                        </div>
+                                        <div class="col-sm-8 padding2px">
+                                            <span><input type="text" id="txtVesselNameview" autocomplete="false" /></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 padding2px">
+                                    <div class="form-inline">
+                                        <div class="col-sm-4 padding2px">
+                                            LOADING VESSEL
+                                        </div>
+                                        <div class="col-sm-8 padding2px">
+                                            <span><input type="text" id="txtLoadingVesselNameview" autocomplete="false" /></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 padding2px">
+                                    <div class="form-inline">
+                                        <div class="col-sm-4">
+                                            JobType
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <div id="cmbJobtypeview"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:10px;">
+                                <div class="col-sm-4 padding2px">
+                                    <div class="row">
+                                        <div class="col-sm-3 padding2px">
+                                            <div id="rbtoeta" style="color:black; font-size:15px">
+                                                O ETA
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3 padding2px">
+                                            <div id="rbtleta" style="color:black; font-size:15px">
+                                                L ETA
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3 padding2px">
+                                            <div id="rbteta" style="color:black; font-size:15px">
+                                                ALL ETA
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3 padding2px">
+                                            <div id="rbtneta" style="color:black; font-size:15px">
+                                                NONE
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-1 text-center padding2px">
+                                    <div id="rbtdis" style="color:black; font-size:15px">
+                                        Pickup
+                                    </div>
+                                </div>
+                                <div class="col-sm-1 text-center padding2px">
+                                    <div id="rbtemp" style="color:black; font-size:15px">
+                                        L.Emp
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 padding2px">
+                                    <div class="row">
+                                        <div class="col-sm-3 padding2px">
+                                            <div id="dtpremarks3" style="color:black; font-size:15px">
+                                                ALL
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5 padding2px">
+                                            <div id="dtpremarks2" style="color:black; font-size:15px">
+                                                WITH OUT
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 padding2px">
+                                            <div id="dtpremarks1" style="color:black; font-size:15px">
+                                                WITH
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-1 text-center padding2px">
+                                    <input class="btn btn-warning" type="button" value="VIEW" id='btnview' style="font-weight:bold; font-family:Verdana;color:#313639;font-size:15px;" />
+                                </div>
+                                <div class="col-sm-1 text-center padding2px">
+                                    <input class="btn btn-warning" type="button" value="EXCEL" id='btnexcel' style="font-weight:bold; font-family:Verdana;color:#313639;font-size:15px;" />
+                                </div>
+
+
+                                <div class="col-sm-1 text-center padding2px">
+                                    <input class="btn btn-warning" type="button" value="Filter" id='btnopenFilter' style="font-weight:bold; font-family:Verdana;color:#313639;font-size:15px;" />
+                                </div>
+                            </div>
+
+
+
+                            <div class="row" style="margin-top:5px;">
+                                <div class="col-sm-4" style="color:forestgreen;font-weight:bold;font-size:large;">
+                                    <div class="form-inline" style="top: 10px;position: relative;">
+                                        <div class="col-sm-6 padding2px">
+                                            Total Amt :
+                                        </div>
+                                        <div class="col-sm-6 padding2px">
+                                            <label id="lblviewamt">99.99.999.00</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2" style="color:forestgreen;font-weight:bold;font-size:large;">
+                                    <div class="form-inline" style="position: relative;">
+                                        <div class="col-sm-8 padding2px">
+                                            Total Count :
+                                        </div>
+                                        <div class="col-sm-4 padding2px">
+                                            <label id="lblviewCount">0</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Filter Window -->
+                            <div id="filterWindow" style="display:none">
+                                <div>Custom Filter</div>
+                                <div style="padding:10px;">
+                                    <div style="margin-bottom:10px;">
+                                        <div>Select Column:</div>
+                                        <div id="columnDropdown"></div>
+                                    </div>
+                                    <div style="margin-bottom:10px;">
+                                        <div>Enter Value:</div>
+                                        <input type="text" id="filterValue" style="width: 95%; height: 25px;" />
+                                    </div>
+                                    <div style="text-align:right; margin-top:10px;">
+                                        <input type="button" id="applyFilter" value="Apply Filter" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*       <div class="col-sm-11">
+
+
+        </div>*@
+                        </div>
+                        <div id="gridf5view" style="margin-top:10px;margin-bottom:560px">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @Scripts.Render("~/bundles/js")
+    @*Main Wrapper*@
+    @*jQuery*@
+    <!--<script src="~/Scripts/jquery-1.12.4.min.js"></script>-->
+    @*Feather Icon JS*@
+    <!--<script src="../assets/js/feather.min.js"></script>-->
+    @*Slimscroll JS*@
+    <!--<script src="../assets/js/jquery.slimscroll.min.js"></script>-->
+    @*Bootstrap Core JS*@
+    <!--<script src="../assets/js/bootstrap.bundle.min.js"></script>-->
+    @*Mask JS*@
+    <!--<script src="../assets/plugins/toastr/toastr.min.js"></script>
+    <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>-->
+    @*Custom JS*@
+    <!--<script src="../assets/js/script.js"></script>
+
+    <script src="~/Content/BootStrap_4/js/bootstrap.min.js"></script>
+    <script src="~/Content/BootStrap_4/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="../jqueryui/jquery-ui.min.js"></script>-->
+
+    <script type="text/javascript" src="../jqwidgets/jqxcore.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxdata.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxbuttons.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxswitchbutton.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxscrollbar.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxlistbox.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxtabs.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxdragdrop.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxdropdownlist.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxradiobutton.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxcombobox.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxpanel.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxcheckbox.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxloader.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxinput.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxpasswordinput.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxwindow.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxcalendar.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxdatetimeinput.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxtextarea.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxgrid.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxmenu.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxgrid.aggregates.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxgrid.edit.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxgrid.filter.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxgrid.pager.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxgrid.columnsresize.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxgrid.columnsreorder.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxgrid.sort.js"></script>
+    <script type="text/javascript" src="../jqwidgets/jqxgrid.selection.js"></script>
+    <script type="text/javascript" src="../jqwidgets/globalization/globalize.js"></script>
+
+    <script src="~/Scripts/J_Scripts/Common.js"></script>
+    <script src="~/Scripts/J_Scripts/loadcombobox.js"></script>
+    @Scripts.Render("~/Scripts/J_Scripts/SaleOrderView.js")
+    <script src="~/Scripts/alasql.min.js"></script>
+    <script src="~/Scripts/xlsx.core.min.js"></script>
+
+
+</body>
+</html>
+
+
