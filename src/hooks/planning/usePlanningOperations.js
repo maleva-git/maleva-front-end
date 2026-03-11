@@ -12,8 +12,10 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { planningApi } from '../../pages/Planning/api/planningApi';
+import { planningApi } from '../../features/Planning/api/planningApi';
 import { truckApi } from '../../api/truckApi';
+
+const isDev = import.meta.env.DEV;
 
 export const usePlanningOperations = (state) => {
   const navigate = useNavigate();
@@ -37,7 +39,7 @@ export const usePlanningOperations = (state) => {
       const data = await planningApi.getMaxPlanningNo(companyId);
       setFormData(prev => ({ ...prev, planningNo: data.maxNo || '' }));
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (isDev) {
         console.error('Error loading max planning no:', error);
       }
     } finally {
@@ -55,7 +57,7 @@ export const usePlanningOperations = (state) => {
       const data = await truckApi.getTrucks(companyId);
       return data || [];
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (isDev) {
         console.error('Error loading trucks:', error);
       }
       return [];
@@ -80,7 +82,7 @@ export const usePlanningOperations = (state) => {
       const data = await planningApi.searchPlanning(params);
       setTableData(data || []);
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (isDev) {
         console.error('Error searching planning:', error);
       }
       setTableData([]);
@@ -120,7 +122,7 @@ export const usePlanningOperations = (state) => {
       resetForm();
       await loadMaxPlanningNo(companyId);
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (isDev) {
         console.error('Error saving planning:', error);
       }
       alert('Error saving planning');
@@ -145,7 +147,7 @@ export const usePlanningOperations = (state) => {
         alert('Planning deleted successfully');
         resetForm();
       } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
+        if (isDev) {
           console.error('Error deleting planning:', error);
         }
         alert('Error deleting planning');

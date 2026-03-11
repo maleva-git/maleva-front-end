@@ -44,7 +44,7 @@ export default function CustomerPage() {
         active: formData.active ? 1 : 0
       };
 
-      console.log(payload);
+
     } else {
       setErrors(validationErrors);
       toast.error('Please fix validation errors');

@@ -33,7 +33,7 @@ export function OperationAdminDashboard() {
   const { data, loading, error } = useDashboardData();
 
   const handleQuickAction = useCallback((action) => {
-    console.log('Quick action clicked:', action.label);
+
   }, []);
 
   if (loading) return <LoadingSpinner />;
@@ -46,11 +46,18 @@ export function OperationAdminDashboard() {
           borderColor: 'var(--color-border)'
         }}>
         <p style={{ color: 'var(--color-text-primary)' }}>Failed to load dashboard data</p>
+        <p className="text-sm mt-2" style={{ color: 'var(--color-text-tertiary)' }}>{error}</p>
       </div>
     );
   }
 
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="text-center py-16">
+        <p style={{ color: 'var(--color-text-primary)' }}>No dashboard data available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6" style={{ backgroundColor: 'var(--color-background)', padding: 'var(--spacing-6)' }}>

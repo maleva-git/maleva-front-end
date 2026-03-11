@@ -11,6 +11,10 @@ export function Sidebar({ isCollapsed, onToggle }) {
   const [expandedCategories, setExpandedCategories] = useState(['FAVOURITES']);
   const [expandedSubCategories, setExpandedSubCategories] = useState([]);
 
+  if (!roleId) {
+    return null;
+  }
+
   const toggleCategory = (category) => {
     setExpandedCategories(prev => 
       prev.includes(category) 

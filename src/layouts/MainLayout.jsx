@@ -2,9 +2,22 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Header } from './Header/Header';
 import { Sidebar } from './Menu/Sidebar';
+import { useTokenRefresh } from '../hooks/useTokenRefresh';
+import { SessionWarning } from '../components/common/SessionWarning';
 
 export default function MainLayout() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  
+  // Auto refresh token when user is active (uses TanStack Query)
+  const { refreshToken } = useTokenRefresh();
+
+  const handleRefreshSession = async () => {
+    try {
+      await refreshToken();
+    } catch (error) {
+      console.error('Manual refresh failed:', error);
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#F7F9FC' }}>
@@ -26,6 +39,9 @@ export default function MainLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Session Warning */}
+      <SessionWarning onRefresh={handleRefreshSession} />
     </div>
   );
 }

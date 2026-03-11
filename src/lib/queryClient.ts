@@ -126,6 +126,76 @@ export const queryKeys = {
     list: (filters?: Record<string, any>) =>
       [...queryKeys.alerts.lists(), { filters }] as const,
   },
+
+  // Sale order queries
+  saleOrders: {
+    all: ['saleOrders'] as const,
+    lists: () => [...queryKeys.saleOrders.all, 'list'] as const,
+    list: (filters?: Record<string, any>) =>
+      [...queryKeys.saleOrders.lists(), { filters }] as const,
+    details: () => [...queryKeys.saleOrders.all, 'detail'] as const,
+    detail: (id: string | number) =>
+      [...queryKeys.saleOrders.details(), id] as const,
+  },
+
+  // Product queries
+  products: {
+    all: ['products'] as const,
+    lists: () => [...queryKeys.products.all, 'list'] as const,
+    list: (companyId?: number) => [...queryKeys.products.lists(), { companyId }] as const,
+    details: () => [...queryKeys.products.all, 'detail'] as const,
+    detail: (id: string | number) => [...queryKeys.products.details(), id] as const,
+  },
+
+  // Port queries (master data — infrequently changing)
+  ports: {
+    all: ['ports'] as const,
+    lists: () => [...queryKeys.ports.all, 'list'] as const,
+    list: (companyId?: number) => [...queryKeys.ports.lists(), { companyId }] as const,
+  },
+
+  // Tax queries (master data — infrequently changing)
+  tax: {
+    all: ['tax'] as const,
+    lists: () => [...queryKeys.tax.all, 'list'] as const,
+    list: (companyId?: number) => [...queryKeys.tax.lists(), { companyId }] as const,
+  },
+
+  // Employee queries
+  employees: {
+    all: ['employees'] as const,
+    lists: () => [...queryKeys.employees.all, 'list'] as const,
+    list: (filters?: Record<string, any>) => [...queryKeys.employees.lists(), { filters }] as const,
+    byCompany: (companyId: number) => [...queryKeys.employees.all, 'company', companyId] as const,
+    byCompanyAndRoles: (companyId: number, roleId?: number, roleId1?: number) =>
+      [...queryKeys.employees.all, 'company', companyId, 'roles', { roleId, roleId1 }] as const,
+    details: () => [...queryKeys.employees.all, 'detail'] as const,
+    detail: (id: string | number) => [...queryKeys.employees.details(), id] as const,
+  },
+
+  // Job status queries (master data — infrequently changing)
+  jobStatuses: {
+    all: ['jobStatuses'] as const,
+    list: () => [...queryKeys.jobStatuses.all, 'list'] as const,
+  },
+
+  // Address queries
+  addresses: {
+    all: ['addresses'] as const,
+    lists: () => [...queryKeys.addresses.all, 'list'] as const,
+    list: (companyId?: number) => [...queryKeys.addresses.lists(), { companyId }] as const,
+    details: () => [...queryKeys.addresses.all, 'detail'] as const,
+    detail: (id: string | number) => [...queryKeys.addresses.details(), id] as const,
+  },
+
+  // Truck queries
+  trucks: {
+    all: ['trucks'] as const,
+    lists: () => [...queryKeys.trucks.all, 'list'] as const,
+    list: (companyId?: number) => [...queryKeys.trucks.lists(), { companyId }] as const,
+    details: () => [...queryKeys.trucks.all, 'detail'] as const,
+    detail: (id: string | number) => [...queryKeys.trucks.details(), id] as const,
+  },
 }
 
 export default queryClient

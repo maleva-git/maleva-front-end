@@ -44,11 +44,11 @@ export default function CustomerList() {
   });
 
   const handleView = (customer) => {
-    console.log('View customer:', customer);
+
   };
 
   const handleEdit = (customer) => {
-    console.log('Edit customer:', customer);
+
   };
 
   const handleDelete = async (customer) => {
