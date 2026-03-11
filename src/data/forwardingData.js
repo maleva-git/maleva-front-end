@@ -5,12 +5,7 @@ export const forwardingCodeOptions = [
   { value: 'k8', label: 'K6' }
 ];
 
-export const forwardingStatusOptions = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'cancelled', label: 'Cancelled' },
-  { value: 'on_hold', label: 'On Hold' }
-];
+
 
 // Default forwarding row structure
 export const defaultForwardingRow = {
@@ -116,5 +111,5 @@ export const forwardingTableColumns = [
   { field: 's1', label: 'S1', type: 'text', width: '80px' },
   { field: 's2', label: 'S2', type: 'text', width: '80px' },
   { field: 'createdDate', label: 'Date', type: 'date', width: '120px' },
-  { field: 'status', label: 'Status', type: 'select', options: forwardingStatusOptions, width: '120px' }
+  
 ];

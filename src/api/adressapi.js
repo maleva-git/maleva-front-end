@@ -1,43 +1,60 @@
 import api from './axios';
 import { API_ENDPOINTS } from './endpoints';
-import { addressmockdata } from '../data/Addressdata';
 
-// Fake delay (simulate real API)
-const delay = (ms) => new Promise(res => setTimeout(res, ms));
-
-let db = [...addressmockdata];
-
-// GET
-export const getAddresses = async () => {
-  await delay(400);
-  return db;
-};
-
-// CREATE
-export const createAddress = async (data) => {
-  await delay(300);
-  const newItem = { ...data, id: Date.now() };
-  db = [...db, newItem];
-  return newItem;
-};
-
-// UPDATE
-export const updateAddress = async ({ id, data }) => {
-  await delay(300);
-  db = db.map(item => (item.id === id ? { ...item, ...data } : item));
-  return { id, ...data };
-};
-
-// DELETE
-export const deleteAddress = async (id) => {
-  await delay(300);
-  db = db.filter(item => item.id !== id);
-  return id;
-};
-
+/**
+ * Address API — all HTTP calls for the address resource.
+ * Mock data and fake delay have been removed.
+ * Errors bubble up to TanStack Query's error state automatically.
+ */
 export const addressApi = {
-  getActiveAddresses: async (companyId) => {
-    const response = await api.get(API_ENDPOINTS.ADDRESS.ACTIVE_BY_COMPANY(companyId));
-    return response.data;
-  }
+  /** Fetch all addresses */
+  getAll: async () => {
+    const { data } = await api.get(API_ENDPOINTS.ADDRESS.LIST);
+    return data?.data ?? data ?? [];
+  },
+
+  /** Fetch a single address by ID */
+  getById: async (id) => {
+    const { data } = await api.get(API_ENDPOINTS.ADDRESS.GET(id));
+    return data?.data ?? data;
+  },
+
+  /** Fetch active addresses for a given company */
+  getActiveByCompany: async (companyId) => {
+    const { data } = await api.get(API_ENDPOINTS.ADDRESS.ACTIVE_BY_COMPANY(companyId));
+    return data?.data ?? data ?? [];
+  },
+
+  /** Search addresses within a company by keyword */
+  search: async (companyId, keyword = '') => {
+    const { data } = await api.get(API_ENDPOINTS.ADDRESS.SEARCH(companyId), {
+      params: { keyword },
+    });
+    return data?.data ?? data ?? [];
+  },
+
+  /** Create a new address */
+  create: async (payload) => {
+    const { data } = await api.post(API_ENDPOINTS.ADDRESS.CREATE, payload);
+    return data?.data ?? data;
+  },
+
+  /** Update an existing address */
+  update: async (id, payload) => {
+    const { data } = await api.put(API_ENDPOINTS.ADDRESS.UPDATE(id), payload);
+    return data?.data ?? data;
+  },
+
+  /** Delete an address by ID */
+  delete: async (id) => {
+    await api.delete(API_ENDPOINTS.ADDRESS.DELETE(id));
+  },
 };
+
+// ---------------------------------------------------------------------------
+// Backward-compatible named exports (keep if anything already imports these)
+// ---------------------------------------------------------------------------
+export const getAddresses = () => addressApi.getAll();
+export const createAddress = (data) => addressApi.create(data);
+export const updateAddress = ({ id, data }) => addressApi.update(id, data);
+export const deleteAddress = (id) => addressApi.delete(id);

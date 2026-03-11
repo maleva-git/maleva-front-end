@@ -1,10 +1,15 @@
 import api from './axios';
+import { API_ENDPOINTS } from './endpoints';
 
+/**
+ * Currency API — currency value lookups.
+ */
 export const currencyApi = {
+  /** Get currency value for a company + customer combination */
   getCurrencyValue: async (companyId, customerId) => {
-    const response = await api.get('/api/currency-value/get', {
-      params: { companyId, customerId }
+    const { data } = await api.get(API_ENDPOINTS.CURRENCY.VALUE, {
+      params: { companyId, customerId },
     });
-    return response.data;
-  }
+    return data?.data ?? data;
+  },
 };

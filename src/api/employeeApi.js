@@ -1,114 +1,67 @@
-import apiClient from './axios';
+import api from './axios';
+import { API_ENDPOINTS } from './endpoints';
 
+/**
+ * Employee API — all HTTP calls for the employee resource.
+ * No try/catch needed: errors bubble up to TanStack Query's error state.
+ * Response shape: { data: [...] } or raw array — normalised with ?? operator.
+ */
 export const employeeApi = {
+  /** Get all employees, optionally filtered by params */
   getAll: async (params = {}) => {
-    try {
-      const response = await apiClient.get('/api/employees', { params });
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error fetching employees:', error);
-      throw error;
-    }
+    const { data } = await api.get(API_ENDPOINTS.EMPLOYEE.LIST, { params });
+    return data?.data ?? data ?? [];
   },
 
-  getByRoleId: async (roleId) => {
-    try {
-      const response = await apiClient.get('/api/employees', {
-        params: { roleId }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-      });
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error fetching employees by roleId:', error);
-      throw error;
-    }
-  },
-
-  getByName: async (name) => {
-    try {
-      const response = await apiClient.get('/api/employees', {
-        params: { name }
-      });
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error fetching employees by name:', error);
-      throw error;
-    }
-  },
-
+  /** Get single employee by ID */
   getById: async (id) => {
-    try {
-      const response = await apiClient.get(`/api/employees/${id}`);
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error fetching employee by id:', error);
-      throw error;
-    }
+    const { data } = await api.get(API_ENDPOINTS.EMPLOYEE.GET(id));
+    return data?.data ?? data;
   },
 
-
-  getByCompanyRefId: async (companyRefId, type = '') => {
-    try {
-      const response = await apiClient.get(`/api/employees/company/${companyRefId}/all`, {
-        
-      });
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error fetching employees by companyRefId:', error);
-      throw error;
-    }
+  /** Get employees filtered by roleId */
+  getByRoleId: async (roleId) => {
+    const { data } = await api.get(API_ENDPOINTS.EMPLOYEE.LIST, { params: { roleId } });
+    return data?.data ?? data ?? [];
   },
 
-  create: async (data) => {
-    try {
-      const response = await apiClient.post('/api/employees', data);
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error creating employee:', error);
-      throw error;
-    }
+  /** Get employees filtered by name */
+  getByName: async (name) => {
+    const { data } = await api.get(API_ENDPOINTS.EMPLOYEE.LIST, { params: { name } });
+    return data?.data ?? data ?? [];
   },
 
-  update: async (id, data) => {
-    try {
-      const response = await apiClient.put(`/api/employees/${id}`, data);
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error updating employee:', error);
-      throw error;
-    }
-  },
-
-  getByCompanyAndRoles: async (companyRefId, roleId, roleId1) => {
-    try {
-      const params = {};
-      if (roleId) params.roleId = roleId;
-      if (roleId1) params.roleId1 = roleId1;
-      const response = await apiClient.get(`/api/employees/company/${companyRefId}/roles`, { params });
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error fetching employees by company and roles:', error);
-      throw error;
-    }
-  },
-
+  /** Get all employees belonging to a company */
   getByCompany: async (companyRefId, type = 'ALL') => {
-    try {
-      const response = await apiClient.get(`/api/employees/company/${companyRefId}/all`, {
-        params: { type }
-      });
-      return response.data.data || response.data;
-    } catch (error) {
-      console.error('Error fetching employees by company:', error);
-      throw error;
-    }
+    const { data } = await api.get(API_ENDPOINTS.EMPLOYEE.BY_COMPANY(companyRefId), {
+      params: { type },
+    });
+    return data?.data ?? data ?? [];
   },
 
+  /** Get employees by company filtered by one or two role IDs */
+  getByCompanyAndRoles: async (companyRefId, roleId, roleId1) => {
+    const params = {};
+    if (roleId) params.roleId = roleId;
+    if (roleId1) params.roleId1 = roleId1;
+    const { data } = await api.get(API_ENDPOINTS.EMPLOYEE.BY_COMPANY_ROLES(companyRefId), { params });
+    return data?.data ?? data ?? [];
+  },
+
+  /** Create a new employee */
+  create: async (payload) => {
+    const { data } = await api.post(API_ENDPOINTS.EMPLOYEE.LIST, payload);
+    return data?.data ?? data;
+  },
+
+  /** Update an existing employee */
+  update: async (id, payload) => {
+    const { data } = await api.put(API_ENDPOINTS.EMPLOYEE.GET(id), payload);
+    return data?.data ?? data;
+  },
+
+  /** Delete an employee by ID */
   delete: async (id) => {
-    try {
-      await apiClient.delete(`/api/employees/${id}`);
-    } catch (error) {
-      console.error('Error deleting employee:', error);
-      throw error;
-    }
-  }
+    await api.delete(API_ENDPOINTS.EMPLOYEE.GET(id));
+  },
 };

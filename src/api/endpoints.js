@@ -67,14 +67,12 @@ export const API_ENDPOINTS = {
     DELETE: (id) => `/api/addresses/${id}`,
   },
   
-  EMPLOYEE: {
-    GET: '/EmployeeMaster/GetEmployee',
-    SELECT_TYPE: '/EmployeeMaster/SelectEmployeeType',
-  },
+
   
   // Auth
   AUTH: {
     LOGIN: '/api/auth/login',
+    REFRESH_TOKEN: '/api/auth/refresh-token',
     EDIT_PASSWORD: '/Login/EditPassword',
   },
   
@@ -116,6 +114,114 @@ export const API_ENDPOINTS = {
   },
 
   TAX: {
-    SELECT: (companyId) => `/api/tax-masters/select/${companyId}`,
+    ACTIVE_BY_COMPANY: (companyId) => `/api/tax-masters/company/${companyId}/active`,
+  },
+
+  // Employee
+  EMPLOYEE: {
+    LIST: '/api/employees',
+    GET: (id) => `/api/employees/${id}`,
+    BY_COMPANY: (companyId) => `/api/employees/company/${companyId}/all`,
+    BY_COMPANY_ROLES: (companyId) => `/api/employees/company/${companyId}/roles`,
+    SELECT_TYPE: '/EmployeeMaster/SelectEmployeeType',
+  },
+
+  // Currency value
+  CURRENCY: {
+    VALUE: '/api/currency-value/get',
+  },
+
+  // Job Status Master (legacy endpoint)
+  JOB_STATUS_MASTER: {
+    SELECT: '/JobStatusMaster/SelectJobStatus',
+  },
+
+  // Sale Order View (legacy endpoints used for list/actions)
+  SALE_ORDER_VIEW: {
+    GET_VIEW: '/SaleOrder/GetSaleOrderView',
+    UPDATE_JOB_STATUS: '/SaleOrder/UpdateJobStatus',
+    CONVERT_TO_DO: '/SaleOrder/DoConvert',
+    CONVERT_TO_INVOICE: '/SaleOrder/InvoiceConvert',
+  },
+
+  // Truck — full set (extends legacy master selects)
+  TRUCK_API: {
+    BY_COMPANY: (companyId) => `/api/trucks/company/${companyId}`,
+    GET: (id) => `/api/trucks/${id}`,
+    LICENSE_CHECK: (truckId) => `/api/trucks/${truckId}/license-check`,
+  },
+
+  // Driver
+  DRIVER_API: {
+    BY_COMPANY: (companyId) => `/api/drivers/company/${companyId}`,
+    GET: (id) => `/api/drivers/${id}`,
+  },
+  // Agent Company (modern API)
+  AGENT_COMPANY_API: {
+    BY_COMPANY: (companyId) => `/api/agent-companies/company/${companyId}`,
+  },
+
+  // Agents (modern API)
+  AGENTS_API: {
+    SELECT_ALL: (companyRefId, jobId) => `/api/agents/select-all?companyRefId=${companyRefId}&jobId=${jobId}`,
+  },
+
+  // Purchase Order (BillsOrderMaster)
+  PURCHASE_ORDER: {
+    VIEW: '/BillsOrderMaster/BillsOrderView',
+    EDIT: '/BillsOrderMaster/BillsOrderEdit',
+    SAVE: '/BillsOrderMaster/BillsOrderSave',
+    DELETE: '/BillsOrderMaster/BillsOrderDelete',
+    UPLOAD: '/BillsOrderMaster/UploadFiles',
+  },
+
+  // Supplier
+  SUPPLIER: {
+    GET: '/SupplierMaster/GetSupplier',
+  },
+
+  // Payment Terms
+  PAYMENT_TERMS: {
+    SELECT: '/PaymentTermsMaster/SelectPaymentTerms',
+  },
+
+  // Item Master
+  ITEM_MASTER: {
+    GET_PRODUCT_LIST: '/ItemMaster/GetProductList',
+  },
+
+  // Job Master
+  JOB_MASTER: {
+    SEARCH: '/JobMaster/SearchJob',
+  },
+
+  // Planning
+  PLANNING: {
+    LIST: '/api/planning/list',
+    GET: (id) => `/api/planning/${id}`,
+    MAX_NO: (companyId) => `/api/planning/max-no/${companyId}`,
+    SAVE: '/api/planning/save',
+    UPDATE: '/api/planning/update',
+    DELETE: (id) => `/api/planning/${id}`,
+    UPDATE_DATES: '/api/planning/update-dates',
+    SEARCH: '/api/planning/search',
+    SORT: '/api/planning/sort',
+    PUSH_RTI: '/api/planning/push-rti',
+  },
+
+  // Vessel Planning
+  VESSEL_PLANNING: {
+    SELECT: '/VESSELPLANING/SelectVESSELPLANING',
+    SELECT_BY_ID: '/VESSELPLANING/SelectVESSELPLANINGById',
+    MAX_NO: '/VESSELPLANING/MaxVESSELPLANINGNo',
+    SAVE: '/VESSELPLANING/SaveVESSELPLANING',
+    DELETE: '/VESSELPLANING/DeleteVESSELPLANING',
+  },
+
+  // Vessel Planning Sale Order Actions
+  VESSEL_SALE_ORDER: {
+    SEARCH_PLANNING: '/SaleOrder/SearchSaleOrdersForPlanning',
+    UPDATE_DETAILS: '/SaleOrder/UpdateSaleOrderDetails',
   },
 };
+
