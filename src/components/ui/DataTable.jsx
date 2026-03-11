@@ -1,13 +1,33 @@
 import { Trash2 } from 'lucide-react';
-import { useState, useRef } from 'react';
-import { TaxLookupModal } from './TaxLookupModal';
-import { ProductLookupModal } from './ProductLookupModal';
+import { useRef, forwardRef, useImperativeHandle } from 'react';
 
-export const DataTable = ({ columns, data, onAddRow, onDeleteRow, onCellChange, products = [], taxes = [] }) => {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [taxModalOpen, setTaxModalOpen] = useState(false);
-  const [currentRow, setCurrentRow] = useState(null);
+export const DataTable = forwardRef(({ columns, data, onAddRow, onDeleteRow, onCellChange, onLookup }, ref) => {
   const inputRefs = useRef({});
+
+  useImperativeHandle(ref, () => ({
+    focusCell: (rowIdx, field) => {
+      setTimeout(() => {
+        const colIdx = columns.findIndex(col => col.field === field);
+        if (colIdx >= 0) {
+          const input = inputRefs.current[`${rowIdx}-${colIdx}`];
+          if (input) input.focus();
+        }
+      }, 100);
+    },
+    focusNextEditable: (rowIdx, currentField) => {
+      setTimeout(() => {
+        const currentColIdx = columns.findIndex(col => col.field === currentField);
+        let nextColIdx = currentColIdx + 1;
+        while (nextColIdx < columns.length && !columns[nextColIdx].editable) {
+          nextColIdx++;
+        }
+        if (nextColIdx < columns.length) {
+          const nextInput = inputRefs.current[`${rowIdx}-${nextColIdx}`];
+          if (nextInput) nextInput.focus();
+        }
+      }, 100);
+    }
+  }));
 
   const handleKeyDown = (e, rowIdx, colIdx) => {
     const isLastRow = rowIdx === data.length - 1;
@@ -18,15 +38,8 @@ export const DataTable = ({ columns, data, onAddRow, onDeleteRow, onCellChange, 
     if (e.key === 'Enter') {
       e.preventDefault();
       
-      if (columns[colIdx].field === 'productCode') {
-        setCurrentRow(rowIdx);
-        setModalOpen(true);
-        return;
-      }
-
-      if (columns[colIdx].field === 'taxCode') {
-        setCurrentRow(rowIdx);
-        setTaxModalOpen(true);
+      if (columns[colIdx].type === 'lookup') {
+        if (onLookup) onLookup(rowIdx, columns[colIdx].field);
         return;
       }
 
@@ -60,7 +73,7 @@ export const DataTable = ({ columns, data, onAddRow, onDeleteRow, onCellChange, 
       const prevInput = inputRefs.current[`${rowIdx - 1}-${colIdx}`];
       if (prevInput) prevInput.focus();
     } else if (e.key === 'ArrowRight') {
-      if (e.target.selectionStart === e.target.value.length) {
+      if (e.target.selectionStart === e.target.value.length || columns[colIdx].type === 'select' || columns[colIdx].type === 'lookup') {
         e.preventDefault();
         let nextColIdx = colIdx + 1;
         while (nextColIdx < columns.length && !columns[nextColIdx].editable) {
@@ -72,7 +85,7 @@ export const DataTable = ({ columns, data, onAddRow, onDeleteRow, onCellChange, 
         }
       }
     } else if (e.key === 'ArrowLeft') {
-      if (e.target.selectionStart === 0) {
+      if (e.target.selectionStart === 0 || columns[colIdx].type === 'select' || columns[colIdx].type === 'lookup') {
         e.preventDefault();
         let prevColIdx = colIdx - 1;
         while (prevColIdx >= 0 && !columns[prevColIdx].editable) {
@@ -86,126 +99,77 @@ export const DataTable = ({ columns, data, onAddRow, onDeleteRow, onCellChange, 
     }
   };
 
-  const handleProductSelect = (product) => {
-    if (currentRow !== null) {
-      onCellChange(currentRow, 'productId', product.id);
-      onCellChange(currentRow, 'productCode', product.productCode);
-      onCellChange(currentRow, 'description', product.productName);
-      onCellChange(currentRow, 'rate', product.saleRate || 0);
-      onCellChange(currentRow, 'taxPercentage', 0);
-    }
-    setModalOpen(false);
-    
-    setTimeout(() => {
-      const qtyColIdx = columns.findIndex(col => col.field === 'qty');
-      const qtyInput = inputRefs.current[`${currentRow}-${qtyColIdx}`];
-      if (qtyInput) qtyInput.focus();
-      setCurrentRow(null);
-    }, 100);
-  };
-
-  const handleTaxSelect = (tax) => {
-    if (currentRow !== null) {
-      onCellChange(currentRow, 'taxRefId', tax.id);
-      onCellChange(currentRow, 'taxCode', tax.code);
-      onCellChange(currentRow, 'taxPercentage', tax.tax || 0);
-    }
-    setTaxModalOpen(false);
-    
-    setTimeout(() => {
-      const taxColIdx = columns.findIndex(col => col.field === 'taxCode');
-      let nextColIdx = taxColIdx + 1;
-      while (nextColIdx < columns.length && !columns[nextColIdx].editable) {
-        nextColIdx++;
-      }
-      if (nextColIdx < columns.length) {
-        const nextInput = inputRefs.current[`${currentRow}-${nextColIdx}`];
-        if (nextInput) nextInput.focus();
-      }
-      setCurrentRow(null);
-    }, 100);
-  };
-
   return (
-    <>
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="bg-gray-100 border-b border-gray-200">
-              <tr>
-                {columns.map((col, idx) => (
-                  <th key={idx} className="px-2 py-2 text-left font-semibold text-gray-700 whitespace-nowrap">
-                    {col.label}
-                  </th>
-                ))}
-                <th className="px-2 py-2 text-center font-semibold text-gray-700 w-10">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((row, rowIdx) => (
-                <tr key={rowIdx} className="border-b border-gray-100 hover:bg-gray-50">
-                  {columns.map((col, colIdx) => (
-                    <td key={colIdx} className="px-2 py-2">
-                      {col.editable ? (
-                        col.type === 'select' ? (
-                          <select
-                            ref={(el) => (inputRefs.current[`${rowIdx}-${colIdx}`] = el)}
-                            value={row[col.field] || ''}
-                            onChange={(e) => onCellChange(rowIdx, col.field, e.target.value)}
-                            onKeyDown={(e) => handleKeyDown(e, rowIdx, colIdx)}
-                            className="w-full h-7 px-2 border border-gray-300 rounded text-xs focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                          >
-                            <option value="">Select</option>
-                            {col.options?.map(opt => (
-                              <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            ref={(el) => (inputRefs.current[`${rowIdx}-${colIdx}`] = el)}
-                            type={col.type || 'text'}
-                            value={row[col.field] || ''}
-                            onChange={(e) => onCellChange(rowIdx, col.field, e.target.value)}
-                            onKeyDown={(e) => handleKeyDown(e, rowIdx, colIdx)}
-                            className="w-full h-7 px-2 border border-gray-300 rounded text-xs focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                          />
-                        )
-                      ) : (
-                        <span className="text-gray-700">{row[col.field] || '-'}</span>
-                      )}
-                    </td>
-                  ))}
-                  <td className="px-2 py-2 text-center">
-                    <button onClick={() => onDeleteRow(rowIdx)} className="text-red-500 hover:text-red-700">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </td>
-                </tr>
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead className="bg-gray-100 border-b border-gray-200">
+            <tr>
+              {columns.map((col, idx) => (
+                <th key={idx} className="px-2 py-2 text-left font-semibold text-gray-700 whitespace-nowrap">
+                  {col.label}
+                </th>
               ))}
-            </tbody>
-          </table>
-        </div>
+              <th className="px-2 py-2 text-center font-semibold text-gray-700 w-10">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, rowIdx) => (
+              <tr key={rowIdx} className="border-b border-gray-100 hover:bg-gray-50">
+                {columns.map((col, colIdx) => (
+                  <td key={colIdx} className="px-2 py-2">
+                    {col.editable ? (
+                      col.type === 'select' ? (
+                        <select
+                          ref={(el) => (inputRefs.current[`${rowIdx}-${colIdx}`] = el)}
+                          value={row[col.field] || ''}
+                          onChange={(e) => onCellChange(rowIdx, col.field, e.target.value)}
+                          onKeyDown={(e) => handleKeyDown(e, rowIdx, colIdx)}
+                          className="w-full h-7 px-2 border border-gray-300 rounded text-xs focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white"
+                        >
+                          <option value="">Select</option>
+                          {col.options?.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          ref={(el) => (inputRefs.current[`${rowIdx}-${colIdx}`] = el)}
+                          type={col.type === 'number' ? 'number' : 'text'}
+                          value={row[col.field] || ''}
+                          onChange={col.type === 'lookup' ? undefined : (e) => onCellChange(rowIdx, col.field, e.target.value)}
+                          onKeyDown={(e) => handleKeyDown(e, rowIdx, colIdx)}
+                          placeholder={col.type === 'lookup' ? 'Select...' : ''}
+                          readOnly={col.type === 'lookup'}
+                          onClick={col.type === 'lookup' && onLookup ? () => onLookup(rowIdx, col.field) : undefined}
+                          className={`w-full h-7 px-2 border border-gray-300 rounded text-xs focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 ${col.type === 'lookup' ? 'cursor-pointer bg-gray-50' : ''}`}
+                        />
+                      )
+                    ) : (
+                      <span className="text-gray-700">{row[col.field] || '-'}</span>
+                    )}
+                  </td>
+                ))}
+                <td className="px-2 py-2 text-center">
+                  <button onClick={() => onDeleteRow(rowIdx)} className="text-red-500 hover:text-red-700 transition-colors">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {data.length === 0 && (
+              <tr>
+                <td colSpan={columns.length + 1} className="px-4 py-8 text-center text-gray-500 bg-gray-50/50">
+                  No items added yet. Let's add the first row.
+                  <button onClick={onAddRow} className="ml-2 text-blue-600 hover:underline">Add Row</button>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
-
-      <ProductLookupModal
-        isOpen={modalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          setCurrentRow(null);
-        }}
-        onSelect={handleProductSelect}
-        products={products}
-      />
-
-      <TaxLookupModal
-        isOpen={taxModalOpen}
-        onClose={() => {
-          setTaxModalOpen(false);
-          setCurrentRow(null);
-        }}
-        onSelect={handleTaxSelect}
-        taxes={taxes}
-      />
-    </>
+    </div>
   );
-};
+});
+
+DataTable.displayName = 'DataTable';

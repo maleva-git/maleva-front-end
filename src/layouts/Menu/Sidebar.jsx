@@ -10,6 +10,9 @@ export function Sidebar({ isCollapsed, onToggle }) {
   const { roleId } = useAuth();
   const [expandedCategories, setExpandedCategories] = useState(['FAVOURITES']);
   const [expandedSubCategories, setExpandedSubCategories] = useState([]);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const isActuallyCollapsed = isCollapsed && !isHovered;
 
   if (!roleId) {
     return null;
@@ -41,8 +44,10 @@ export function Sidebar({ isCollapsed, onToggle }) {
 
   return (
     <div 
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`flex flex-col h-full transition-all duration-300 border-r ${
-        isCollapsed ? 'w-16' : 'w-64'
+        isActuallyCollapsed ? 'w-16' : 'w-64'
       }`}
       style={{
         backgroundColor: 'var(--color-surface)',
@@ -93,9 +98,9 @@ export function Sidebar({ isCollapsed, onToggle }) {
             <div key={category.category} className="mb-2">
               {/* Category Header */}
               <button
-                onClick={() => !isCollapsed && toggleCategory(category.category)}
+                onClick={() => !isActuallyCollapsed && toggleCategory(category.category)}
                 className={`w-full flex items-center px-4 py-3 text-left transition-all duration-200 group ${
-                  isCollapsed ? 'justify-center' : 'justify-between'
+                  isActuallyCollapsed ? 'justify-center' : 'justify-between'
                 }`}
                 style={{ backgroundColor: 'transparent' }}
                 onMouseEnter={(e) => { e.target.style.backgroundColor = 'var(--color-primary-50)'; }}
@@ -105,13 +110,13 @@ export function Sidebar({ isCollapsed, onToggle }) {
                   <div className="p-2 rounded-lg transition-all duration-200" style={{ backgroundColor: 'var(--color-gray-100)' }}>
                     <CategoryIcon className="w-4 h-4 transition-colors duration-200" style={{ color: 'var(--color-gray-600)' }} />
                   </div>
-                  {!isCollapsed && (
+                  {!isActuallyCollapsed && (
                     <span className="ml-3 text-sm font-semibold transition-colors duration-200" style={{ color: 'var(--color-text-primary)' }}>
                       {category.category}
                     </span>
                   )}
                 </div>
-                {!isCollapsed && (
+                {!isActuallyCollapsed && (
                   <div className="transition-all duration-200" style={{ color: 'var(--color-text-quaternary)' }}>
                     {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </div>
@@ -119,7 +124,7 @@ export function Sidebar({ isCollapsed, onToggle }) {
               </button>
 
               {/* Category Items */}
-              {isExpanded && !isCollapsed && (
+              {isExpanded && !isActuallyCollapsed && (
                 <div className="ml-6 mt-1 space-y-1">
                   {/* Direct Items */}
                   {category.items?.map((item) => {
@@ -244,7 +249,7 @@ export function Sidebar({ isCollapsed, onToggle }) {
       </div>
 
       {/* Sidebar Footer */}
-      {!isCollapsed && (
+      {!isActuallyCollapsed && (
         <div 
           className="p-4 border-t"
           style={{ borderColor: 'var(--color-border-light)' }}

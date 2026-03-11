@@ -1,8 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { Settings, Ship, MapPin, Send, Bell } from 'lucide-react';
 import { SaleOrderHeader } from '../components/SaleOrderHeader';
 import { Tabs } from '../../../components/ui/Tabs';
 import { DataTable } from '../../../components/ui/DataTable';
+import { ProductLookupModal } from '../../../components/ui/ProductLookupModal';
+import { TaxLookupModal } from '../../../components/ui/TaxLookupModal';
 import { FormField, FormRow } from '../../../components/ui/FormField';
 import { MultiAddressManager } from '../../../components/ui/MultiAddressManager';
 import { ForwardingManager } from '../components/ForwardingManager';
@@ -20,8 +22,11 @@ import { useAuth } from '../../../hooks/useAuth';
 
 const SaleOrderAdd = () => {
   const { user, companyId: authCompanyId } = useAuth();
-
-
+  
+  const [productModalOpen, setProductModalOpen] = useState(false);
+  const [taxModalOpen, setTaxModalOpen] = useState(false);
+  const [activeRowIdx, setActiveRowIdx] = useState(null);
+  const tableRef = useRef(null);
 
   const { data: customers = [] } = useCustomers();
   const companyId = useMemo(() => {
@@ -119,6 +124,43 @@ const SaleOrderAdd = () => {
     })).filter(opt => opt.value && opt.label);
   }, [employees]);
 
+  const handleLookup = (rowIdx, field) => {
+    setActiveRowIdx(rowIdx);
+    if (field === 'productCode') {
+      setProductModalOpen(true);
+    } else if (field === 'taxCode') {
+      setTaxModalOpen(true);
+    }
+  };
+
+  const handleProductSelect = (product) => {
+    if (activeRowIdx !== null) {
+      handleCellChange(activeRowIdx, 'productId', product.id);
+      handleCellChange(activeRowIdx, 'productCode', product.productCode);
+      handleCellChange(activeRowIdx, 'description', product.productName);
+      handleCellChange(activeRowIdx, 'rate', product.saleRate || 0);
+      handleCellChange(activeRowIdx, 'taxPercentage', 0);
+    }
+    setProductModalOpen(false);
+    if (tableRef.current) {
+        tableRef.current.focusCell(activeRowIdx, 'qty');
+    }
+    setActiveRowIdx(null);
+  };
+
+  const handleTaxSelect = (tax) => {
+    if (activeRowIdx !== null) {
+      handleCellChange(activeRowIdx, 'taxRefId', tax.id);
+      handleCellChange(activeRowIdx, 'taxCode', tax.code);
+      handleCellChange(activeRowIdx, 'taxPercentage', tax.tax || 0);
+    }
+    setTaxModalOpen(false);
+    if (tableRef.current) {
+        tableRef.current.focusNextEditable(activeRowIdx, 'taxCode');
+    }
+    setActiveRowIdx(null);
+  };
+
   const {
  
     countryOptions,
@@ -209,12 +251,12 @@ const SaleOrderAdd = () => {
 
   const tableColumns = [
     { label: 'S.No', field: 'sno', editable: false },
-    { label: 'Product Code', field: 'productCode', editable: true },
+    { label: 'Product Code', field: 'productCode', editable: true, type: 'lookup' },
     { label: 'Description', field: 'description', editable: true },
     { label: 'Remarks', field: 'remarks', editable: true },
     { label: 'Qty', field: 'qty', editable: true, type: 'number' },
     { label: 'Rate', field: 'rate', editable: true, type: 'number' },
-    { label: 'TaxCode', field: 'taxCode', editable: true },
+    { label: 'TaxCode', field: 'taxCode', editable: true, type: 'lookup' },
     { label: 'Tax%', field: 'taxPercentage', editable: true, type: 'number' },
     { label: 'GST Amount', field: 'gstAmount', editable: false },
     { label: 'Amount', field: 'amount', editable: false }
@@ -512,14 +554,34 @@ const SaleOrderAdd = () => {
         <Tabs tabs={visibleTabs} defaultTab={0} />
 
         <DataTable
+          ref={tableRef}
           columns={tableColumns}
           data={tableData}
           onAddRow={handleAddItem}
           onDeleteRow={handleDeleteItem}
           onCellChange={handleCellChange}
+          onLookup={handleLookup}
+        />
+
+        <ProductLookupModal
+          isOpen={productModalOpen}
+          onClose={() => {
+            setProductModalOpen(false);
+            setActiveRowIdx(null);
+          }}
+          onSelect={handleProductSelect}
           products={products}
+        />
+
+        <TaxLookupModal
+          isOpen={taxModalOpen}
+          onClose={() => {
+            setTaxModalOpen(false);
+            setActiveRowIdx(null);
+          }}
+          onSelect={handleTaxSelect}
           taxes={taxes}
-          />
+        />
       </div>
     </div>
   );
