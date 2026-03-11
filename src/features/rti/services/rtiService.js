@@ -69,7 +69,7 @@ export class RTIService {
   }
 
   // Fill item details from job number
-  static async fillItemsByJobNo(jobNo, comid) {
+  static async fillItemsByJobNo(jobNo) {
     try {
       const response = await rtiApi.getSaleOrderById(jobNo);
       

@@ -35,13 +35,13 @@ export const rtiApi = {
   // Get drivers
   getDrivers: async (comid) => {
     const response = await apiClient.post(API_ENDPOINTS.DRIVER.SELECT, { Comid: comid });
-    return response.data.data || [];
+    return response.data?.data || response.data || [];
   },
 
   // Get trucks
   getTrucks: async (comid) => {
     const response = await apiClient.post(API_ENDPOINTS.TRUCK.SELECT, { Comid: comid });
-    return response.data.data || [];
+    return response.data?.data || response.data || [];
   },
 
   // Get truck details by ID
@@ -59,16 +59,13 @@ export const rtiApi = {
   // Get agent companies
   getAgentCompanies: async (comid) => {
     const response = await apiClient.post(API_ENDPOINTS.AGENT_COMPANY.SELECT, { Comid: comid });
-    return response.data.data || [];
+    return response.data?.data || response.data || [];
   },
 
   // Get agents by company
   getAgentsByCompany: async (comid, jobid) => {
-    const response = await apiClient.post('/AgentMaster/SelectAgentAll', {
-      Comid: comid,
-      Jobid: jobid,
-    });
-    return response.data;
+    const response = await apiClient.post(API_ENDPOINTS.AGENTS_API.SELECT_ALL(comid, jobid));
+    return response.data?.data || response.data || [];
   },
 
   // Get employees
@@ -78,7 +75,7 @@ export const rtiApi = {
       type,
       type1,
     });
-    return response.data.data || [];
+    return response.data?.data || response.data || [];
   },
 
   // Verify password

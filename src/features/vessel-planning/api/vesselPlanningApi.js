@@ -1,33 +1,48 @@
 import api from '../../../api/axios';
+import { API_ENDPOINTS } from '../../../api/endpoints';
 
 export const vesselPlanningApi = {
-  getList: (params) => 
-    api.post('/VESSELPLANING/SelectVESSELPLANING', params),
+  getList: async (params) => {
+    const { data } = await api.post(API_ENDPOINTS.VESSEL_PLANNING.SELECT, params);
+    return data;
+  },
 
-  getById: (id) => 
-    api.post('/VESSELPLANING/SelectVESSELPLANINGById', { 
+  getById: async (id) => {
+    const { data } = await api.post(API_ENDPOINTS.VESSEL_PLANNING.SELECT_BY_ID, { 
       Id: id, 
       Comid: localStorage.getItem('Comid') 
-    }),
+    });
+    return data;
+  },
 
-  getMaxNo: () => 
-    api.post('/VESSELPLANING/MaxVESSELPLANINGNo', { 
+  getMaxNo: async () => {
+    const { data } = await api.post(API_ENDPOINTS.VESSEL_PLANNING.MAX_NO, { 
       Comid: localStorage.getItem('Comid'), 
       BillType: '' 
-    }),
+    });
+    return data;
+  },
 
-  searchSaleOrders: (params) => 
-    api.post('/SaleOrder/SearchSaleOrdersForPlanning', params),
+  searchSaleOrders: async (params) => {
+    const { data } = await api.post(API_ENDPOINTS.VESSEL_SALE_ORDER.SEARCH_PLANNING, params);
+    return data;
+  },
 
-  save: (data) => 
-    api.post('/VESSELPLANING/SaveVESSELPLANING', data),
+  save: async (payload) => {
+    const { data } = await api.post(API_ENDPOINTS.VESSEL_PLANNING.SAVE, payload);
+    return data;
+  },
 
-  update: (data) => 
-    api.post('/SaleOrder/UpdateSaleOrderDetails', data),
+  update: async (payload) => {
+    const { data } = await api.post(API_ENDPOINTS.VESSEL_SALE_ORDER.UPDATE_DETAILS, payload);
+    return data;
+  },
 
-  delete: (id) => 
-    api.post('/VESSELPLANING/DeleteVESSELPLANING', { 
+  delete: async (id) => {
+    const { data } = await api.post(API_ENDPOINTS.VESSEL_PLANNING.DELETE, { 
       Id: id, 
       Comid: localStorage.getItem('Comid') 
-    }),
+    });
+    return data;
+  },
 };
