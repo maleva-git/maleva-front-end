@@ -84,10 +84,6 @@ export default function AddnewitemTable({
       return;
     }
 
-    console.log("INSERT / UPDATE", {
-      tableName,
-      data: rows[rowIndex],
-    });
 
     setRows((prev) => [...prev, { ...emptyRow }]);
 

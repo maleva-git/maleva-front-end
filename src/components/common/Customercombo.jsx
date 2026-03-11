@@ -21,9 +21,12 @@ const CustomerComboBox = ({
     [options, value]
   );
 
+  // Synchronize internal query state with external value changes
   useEffect(() => {
-    setQuery(selectedOption?.label || "");
-  }, [selectedOption]);
+    if (!isOpen) {
+      setQuery(selectedOption?.label || "");
+    }
+  }, [selectedOption, isOpen]);
 
   useEffect(() => {
     return () => {
@@ -70,6 +73,7 @@ const CustomerComboBox = ({
     if (blurTimeoutRef.current) {
       clearTimeout(blurTimeoutRef.current);
     }
+    setQuery(selectedOption?.label || "");
     setIsOpen(true);
   };
 
@@ -105,7 +109,10 @@ const CustomerComboBox = ({
                 <button
                   type="button"
                   key={opt.value}
-                  onMouseDown={() => handleSelect(opt)}
+                  onMouseDown={(e) => {
+                    e.preventDefault(); // Prevents input onBlur matching stale closure
+                    handleSelect(opt);
+                  }}
                   className="w-full px-3 py-2 text-left text-xs text-gray-700 hover:bg-blue-50"
                 >
                   {opt.label}

@@ -26,9 +26,7 @@ const SearchableSelect = ({
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-        setSearchTerm('');
-        setHighlightedIndex(0);
+        handleClose();
       }
     };
 
@@ -42,11 +40,15 @@ const SearchableSelect = ({
     }
   }, [highlightedIndex, isOpen]);
 
-  const handleSelect = (optionValue) => {
-    onChange({ target: { value: optionValue } });
+  const handleClose = () => {
     setIsOpen(false);
     setSearchTerm('');
     setHighlightedIndex(0);
+  };
+
+  const handleSelect = (optionValue) => {
+    onChange({ target: { value: optionValue } });
+    handleClose();
   };
 
   const handleClear = (e) => {
@@ -82,9 +84,7 @@ const SearchableSelect = ({
         break;
       case 'Escape':
         e.preventDefault();
-        setIsOpen(false);
-        setSearchTerm('');
-        setHighlightedIndex(0);
+        handleClose();
         break;
     }
   };

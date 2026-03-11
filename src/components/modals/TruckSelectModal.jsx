@@ -1,25 +1,33 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { X, Search, Truck } from 'lucide-react';
 
-const TruckSelectModal = ({ isOpen, onClose, onSelect, trucks = [] }) => {
+/**
+ * Inner component that mounts only when the modal is open.
+ * State resets naturally on each mount — no useEffect needed.
+ */
+const TruckSelectModalContent = ({ onClose, onSelect, trucks }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredTrucks, setFilteredTrucks] = useState(trucks);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    const filtered = trucks.filter(truck =>
+  const filteredTrucks = useMemo(() => {
+    return trucks.filter(truck =>
       truck.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setFilteredTrucks(filtered);
-    setSelectedIndex(0);
   }, [searchTerm, trucks]);
+
+  // Only side-effect: auto-focus the input on mount
+  useEffect(() => {
+    const timer = setTimeout(() => inputRef.current?.focus(), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Reset selectedIndex alongside searchTerm in the same handler
+  // so both updates are batched into a single render.
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setSelectedIndex(0);
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowDown') {
@@ -38,11 +46,8 @@ const TruckSelectModal = ({ isOpen, onClose, onSelect, trucks = [] }) => {
 
   const handleSelect = (truck) => {
     onSelect(truck);
-    setSearchTerm('');
     onClose();
   };
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -64,7 +69,7 @@ const TruckSelectModal = ({ isOpen, onClose, onSelect, trucks = [] }) => {
               ref={inputRef}
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
               placeholder="Search truck..."
               className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -83,7 +88,7 @@ const TruckSelectModal = ({ isOpen, onClose, onSelect, trucks = [] }) => {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span>{truck.name}</span>
+                    <span>{truck.name ?? ''}</span>
                     {truck.licenseExpired && (
                       <span className="text-xs text-red-600 font-semibold">Expired</span>
                     )}
@@ -102,6 +107,15 @@ const TruckSelectModal = ({ isOpen, onClose, onSelect, trucks = [] }) => {
       </div>
     </div>
   );
+};
+
+/**
+ * Outer gate: only mounts the content when isOpen is true.
+ * This ensures all internal state resets on each open without needing effects.
+ */
+const TruckSelectModal = ({ isOpen, onClose, onSelect, trucks = [] }) => {
+  if (!isOpen) return null;
+  return <TruckSelectModalContent onClose={onClose} onSelect={onSelect} trucks={trucks} />;
 };
 
 export default TruckSelectModal;

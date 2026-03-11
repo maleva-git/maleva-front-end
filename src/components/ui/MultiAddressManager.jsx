@@ -1,9 +1,9 @@
 import { Plus, Trash2, Search } from 'lucide-react';
 import { useState } from 'react';
 import { AddressSearchModal } from '../common/AddressSearchModal';
-import { useActiveAddresses } from '../../pages/Saleorder/useSaleOrderQueries';
+import { useActiveAddresses } from '../../features/sale-order/hooks/useSaleOrderQueries';
 
-export const MultiAddressManager = ({ type, addresses, onAddressChange, totalWeight, totalQuantity, commonLocation, onCommonLocationChange }) => {
+export const MultiAddressManager = ({ type, addresses, onAddressChange, commonLocation, onCommonLocationChange }) => {
   const title = type === 'pickup' ? 'Pickup Addresses' : 'Delivery Addresses';
   const headerColor = type === 'pickup' ? 'bg-blue-600' : 'bg-green-600';
   const accentColor = type === 'pickup' ? 'blue' : 'green';

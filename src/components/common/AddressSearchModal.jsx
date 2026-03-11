@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { X, Search, MapPin, Building2 } from 'lucide-react';
 
 export const AddressSearchModal = ({ isOpen, onClose, addresses = [], onSelect }) => {
@@ -6,22 +6,23 @@ export const AddressSearchModal = ({ isOpen, onClose, addresses = [], onSelect }
   const [selectedIndex, setSelectedIndex] = useState(0);
   const searchInputRef = useRef(null);
 
-  const filteredAddresses = addresses.filter(addr =>
-    addr.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    addr.address?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredAddresses = useMemo(() => {
+    return addresses.filter(addr =>
+      addr.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      addr.address?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [searchTerm, addresses]);
 
   useEffect(() => {
-    if (isOpen) {
-      setSearchTerm('');
-      setSelectedIndex(0);
+    if (isOpen && searchInputRef.current) {
       setTimeout(() => searchInputRef.current?.focus(), 100);
     }
   }, [isOpen]);
 
-  useEffect(() => {
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
     setSelectedIndex(0);
-  }, [searchTerm]);
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowDown') {
@@ -34,19 +35,27 @@ export const AddressSearchModal = ({ isOpen, onClose, addresses = [], onSelect }
       e.preventDefault();
       handleSelect(filteredAddresses[selectedIndex]);
     } else if (e.key === 'Escape') {
-      onClose();
+      handleClose();
     }
   };
 
   const handleSelect = (address) => {
     onSelect(address.address);
+    setSearchTerm('');
+    setSelectedIndex(0);
+    onClose();
+  };
+
+  const handleClose = () => {
+    setSearchTerm('');
+    setSelectedIndex(0);
     onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={handleClose}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col border border-gray-200" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 rounded-t-2xl flex items-center justify-between">
@@ -60,7 +69,7 @@ export const AddressSearchModal = ({ isOpen, onClose, addresses = [], onSelect }
             </div>
           </div>
           <button 
-            onClick={onClose} 
+            onClick={handleClose} 
             className="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-lg transition-all"
           >
             <X className="w-5 h-5" />
@@ -75,7 +84,7 @@ export const AddressSearchModal = ({ isOpen, onClose, addresses = [], onSelect }
               ref={searchInputRef}
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
               placeholder="Search by name or address..."
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl text-sm font-medium focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 bg-white shadow-sm"
@@ -151,7 +160,7 @@ export const AddressSearchModal = ({ isOpen, onClose, addresses = [], onSelect }
             </span>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="px-5 py-2.5 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-300 transition-all shadow-sm hover:shadow"
           >
             Cancel
