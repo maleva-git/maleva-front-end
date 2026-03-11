@@ -31,6 +31,9 @@ export default defineConfig({
       '@app': path.resolve(__dirname, './src/app'),
     },
   },
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
