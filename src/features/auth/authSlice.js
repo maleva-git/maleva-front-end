@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginApi } from "./authApi";
+import { authService } from "./authService";
 import { authStorage } from "./authStorage";
 
 export const login = createAsyncThunk(
   "auth/login",
   async ({ username, password }, { rejectWithValue }) => {
     try {
-      const data = await loginApi({ userName: username, password });
+      const data = await authService.login({ userName: username, password });
       authStorage.setAuth(data);
       return data;
     } catch (error) {

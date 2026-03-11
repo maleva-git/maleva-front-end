@@ -12,7 +12,7 @@ import { AnimatedButton } from "../../components/ui/AnimatedButton";
 import { AnimatedInput, AnimatedPasswordInput } from "../../components/ui/AnimatedInputs";
 
 // Assets
-import Logo from "../../assets/login/logo.png";
+import Logo from "../../assets/login/roundlogo.png";
 import TruckMaleva from "../../assets/login/truckmaleva.jpg";
 
 export default function Login() {
@@ -64,8 +64,7 @@ export default function Login() {
           onClick={() => navigate("/")}
           logoSrc={Logo}
           title="Maleva"
-          subtitle="Logistics Platform"
-        />
+          subtitle="Ship Spare in Transit"        />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 animate-slide-up-form">
           {error && (
